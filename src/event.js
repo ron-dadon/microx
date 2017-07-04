@@ -3,6 +3,7 @@
  */
 
 const uuid = require('./uuid')
+const kc = require('kebab-case')
 
 module.exports = class Event {
 
@@ -16,6 +17,7 @@ module.exports = class Event {
       this.time = Date.now()
       this.emitter = emitter
     }
+    this.name = kc(this.name)
   }
 
 }

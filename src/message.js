@@ -6,11 +6,10 @@ const uuid = require('./uuid')
 
 module.exports = class Message {
 
-  constructor(data, id, parentId) {
+  constructor(data, id) {
     this.id = id || uuid()
     this.data = data
     this.time = Date.now()
-    this.parentId = parentId
   }
 
 }

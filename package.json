@@ -12,6 +12,8 @@
     "express": "^4.15.3",
     "http-status-codes": "^1.1.6",
     "ioredis": "^3.1.1",
+    "kebab-case": "^1.0.0",
+    "request": "^2.81.0",
     "uuid": "^3.1.0"
   }
 }
