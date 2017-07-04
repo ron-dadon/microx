@@ -4,9 +4,14 @@
 
 const kc = require('kebab-case')
 
+/**
+ * List of registry methods available for services
+ *
+ * @type {{REGISTER, UNREGISTER, GET_SERVICE, EVENTS}}
+ */
 module.exports = {
   REGISTER: kc('__register'),
   UNREGISTER: kc('__unRegister'),
   GET_SERVICE: kc('__getService'),
-  EVENTS: kc('__events')
+  EVENTS: kc('__eventsBroadcaster')
 }

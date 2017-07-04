@@ -11,7 +11,7 @@ module.exports = class Registry {
 
   constructor() {
     this.services = {}
-    this.events = []
+    this.events = {}
     this.server = new Server()
     this.server.provide(RegistryMethods.REGISTER, this._register.bind(this))
     this.server.provide(RegistryMethods.UNREGISTER, this._unregister.bind(this))
@@ -19,10 +19,23 @@ module.exports = class Registry {
     this.server.provide(RegistryMethods.EVENTS, this._events.bind(this))
   }
 
+  /**
+   * Start the registry server
+   *
+   * @param {Number} port Port number
+   * @param {String} host Host address
+   */
   listen(port, host) {
     this.server.listen(port, host)
   }
 
+  /**
+   * Register a service in the system
+   *
+   * @param {Message} msg The registration message
+   * @param {Function<Error, Object>} reply The reply function
+   * @private
+   */
   _register(msg, reply) {
     let service = new ServiceMeta(msg.data.name, msg.data.version, msg.data.port, msg.data.host, msg.data.secure)
     if (!this.services[service.versionName]) {
@@ -32,6 +45,13 @@ module.exports = class Registry {
     reply(null, service)
   }
 
+  /**
+   * Unregister a service from the system
+   *
+   * @param {Message} msg The message with the details of the service to un-register
+   * @param {Function<Error, Object>} reply The reply function
+   * @private
+   */
   _unregister(msg, reply) {
     let name = msg.data.versionName
     let id = msg.data.id
@@ -46,6 +66,13 @@ module.exports = class Registry {
     reply(new Error('Service is not registered'))
   }
 
+  /**
+   * Get instance of a service
+   *
+   * @param {Message} msg The message with the details of the service
+   * @param {Function<Error, Object>} reply The reply function
+   * @private
+   */
   _getService(msg, reply) {
     let name = msg.data.name
     if (!this.services[name]) return reply(new Error('Service not found'))
@@ -53,7 +80,14 @@ module.exports = class Registry {
     reply(null, this.services[name][index])
   }
 
-
+  /**
+   * Handle events delegation
+   * All events sent to this method by the services will emit to all other services
+   *
+   * @param {Message} msg The message with the event data
+   * @param {Function<Error, Object>} reply The reply function
+   * @private
+   */
   _events(msg, reply) {
     let event = msg.data
     let emit = this._emitEvent
@@ -61,13 +95,22 @@ module.exports = class Registry {
       if (!this.services.hasOwnProperty(service)) continue
       this.services[service].forEach((s) => {
         let url = s.url
-        emit(event).then(console.log).catch(console.error)
+        emit(event, url).then(console.log).catch(console.error)
       })
     }
+    reply()
   }
 
+  /**
+   * Emit a single event to a single service instance
+   *
+   * @param {Event} event The event to emit
+   * @param {String} url The URL of the target service
+   * @returns {Promise<Boolean, Error>}
+   * @private
+   */
   _emitEvent(event, url) {
-    request({
+    return request({
       url: url + '/__events',
       method: 'POST',
       json: true,
@@ -79,7 +122,7 @@ module.exports = class Registry {
         return Promise.reject(err)
       }
       return true
-    })
+    }).catch(() => {})
 
   }
 

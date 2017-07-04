@@ -32,7 +32,7 @@ module.exports = class Client extends EventEmitter {
    *
    * @param {String} method Service and method
    * @param {Object} data Data to pass to the method
-   * @param {Message} parentMessage Parent message in case of multiple / canonical calls
+   * @param {Message} [parentMessage] Parent message in case of multiple / canonical calls
    * @returns {Promise<Message, Error>}
    */
   call(method, data, parentMessage) {

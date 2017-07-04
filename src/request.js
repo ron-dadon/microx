@@ -6,8 +6,10 @@ const request = require('request')
 
 /**
  * Promise wrapper for request module
- * @param options
- * @returns {Promise}
+ *
+ * @param {Object} options Request module options object
+ *
+ * @returns {Promise<IncomingMessage, Error>}
  */
 module.exports = function(options) {
   return new Promise((res, rej) => {

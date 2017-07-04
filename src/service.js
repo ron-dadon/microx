@@ -29,4 +29,12 @@ module.exports = class Service {
     return this.client.call(method, data, parentMessage)
   }
 
+  broadcast(event, data) {
+    return this.client.broadcast(event, data, this.meta.versionName)
+  }
+
+  react(event, handler) {
+    this.server.react(event, handler)
+  }
+
 }
