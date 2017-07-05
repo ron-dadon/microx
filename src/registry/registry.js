@@ -5,10 +5,15 @@
 const RegistryMethods = require('./registry-methods')
 const Server = require('../rpc/server')
 const request = require('../request')
-const ServiceMeta = require('../service-meta')
+const ServiceMeta = require('../service/service-meta')
+const Queue = require ('../queue')
+const RoundRobinList = require('../round-robin-list')
 
 module.exports = class Registry {
 
+  /**
+   * Setup basic registry methods and initialize lists
+   */
   constructor() {
     this.services = {}
     this.events = {}
@@ -39,7 +44,7 @@ module.exports = class Registry {
   _register(msg, reply) {
     let service = new ServiceMeta(msg.data.name, msg.data.version, msg.data.port, msg.data.host, msg.data.secure)
     if (!this.services[service.versionName]) {
-      this.services[service.versionName] = []
+      this.services[service.versionName] = new RoundRobinList()
     }
     this.services[service.versionName].push(service)
     reply(null, service)
@@ -75,14 +80,14 @@ module.exports = class Registry {
    */
   _getService(msg, reply) {
     let name = msg.data.name
-    if (!this.services[name]) return reply(new Error('Service not found'))
-    let index = Math.floor(Math.random() * this.services[name].length)
-    reply(null, this.services[name][index])
+    if (!this.services[name] || this.services[name].length === 0) return reply(new Error('Service not found'))
+    reply(null, this.services[name].getNext())
   }
 
   /**
    * Handle events delegation
    * All events sent to this method by the services will emit to all other services
+   * later by the event processing function
    *
    * @param {Message} msg The message with the event data
    * @param {Function<Error, Object>} reply The reply function
@@ -90,15 +95,15 @@ module.exports = class Registry {
    */
   _events(msg, reply) {
     let event = msg.data
-    let emit = this._emitEvent
     for (let service in this.services) {
       if (!this.services.hasOwnProperty(service)) continue
-      this.services[service].forEach((s) => {
-        let url = s.url
-        emit(event, url).then(console.log).catch(console.error)
-      })
+      if (!this.events[service]) {
+        this.events[service] = new Queue()
+      }
+      this.events[service].push(event)
     }
     reply()
+    process.nextTick(this._processEvents.bind(this))
   }
 
   /**
@@ -126,4 +131,25 @@ module.exports = class Registry {
 
   }
 
+  /**
+   * Process pending events that are waiting in the events queue
+   *
+   * @private
+   */
+  _processEvents() {
+    let $this = this
+    let processEvents = this._processEvents
+    let emit = this._emitEvent
+    for (let service in this.events) {
+      if (!this.events.hasOwnProperty(service)) continue
+      let event = this.events[service].peek()
+      let removeEvent = this.events[service].pop.bind(this.events[service])
+      if (!event) continue
+      let s = this.services[service].getNext()
+      let url = s.url
+      emit(event, url).then(removeEvent).catch((e) => {
+        process.nextTick(processEvents.bind($this))
+      })
+    }
+  }
 }

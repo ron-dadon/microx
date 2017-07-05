@@ -55,7 +55,7 @@ module.exports = class Client extends EventEmitter {
 
         // If service returned an error status, build Error object and reject the promise
         if (response.statusCode >= 400) {
-          let err = new Error(response.body.message)
+          let err = new Error(response.body ? response.body.message || 'Interval Server Error' : 'Internal Server Error')
           err.statusCode = response.statusCode
           return Promise.reject(err)
         }
@@ -91,8 +91,8 @@ module.exports = class Client extends EventEmitter {
     }).then((response) => {
 
       // If response is not 204 NO CONTENT, reject with an error
-      if (response.statusCode !== 204) {
-        let err = new Error(response.body.message)
+      if (response.statusCode >= 400) {
+        let err = new Error(response.body ? response.body.message || 'Internal Server Error' : 'Internal Server Error')
         err.statusCode = response.statusCode
         return Promise.reject(err)
       }
@@ -165,7 +165,7 @@ module.exports = class Client extends EventEmitter {
 
       // If response is not 200 OK, reject with an error
       if (response.statusCode !== 200) {
-        let err = new Error(response.body.message || 'Internal Server Error')
+        let err = new Error(response.body ? response.body.message || 'Internal Server Error' : 'Internal Server Error')
         err.statusCode = response.statusCode
         return Promise.reject(err)
       }

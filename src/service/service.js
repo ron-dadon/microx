@@ -3,9 +3,9 @@
  */
 
 const ServiceMeta = require('./service-meta')
-const RegistryMethods = require('./registry/registry-methods')
-const Client = require('./rpc/client')
-const Server = require('./rpc/server')
+const RegistryMethods = require('./../registry/registry-methods')
+const Client = require('./../rpc/client')
+const Server = require('./../rpc/server')
 
 module.exports = class Service {
 
@@ -18,7 +18,7 @@ module.exports = class Service {
 
   start() {
     this.server.listen(this.meta.port, this.meta.host)
-    this.client.call('registry::' + RegistryMethods.REGISTER, this.meta).then(console.log).catch(console.error)
+    return this.client.call('registry::' + RegistryMethods.REGISTER, this.meta)
   }
 
   provide(method, handler) {

@@ -2,7 +2,7 @@
  * Created by ron on 7/4/2017.
  */
 
-const uuid = require('./uuid')
+const uuid = require('../uuid')
 
 module.exports = class ServiceMeta {
 

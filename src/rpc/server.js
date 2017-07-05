@@ -6,7 +6,7 @@ const express = require('express')
 const jsonParser = require('body-parser').json
 const HttpsStatus = require('http-status-codes')
 const EventEmitter = require('events')
-const ServerMetrics = require('../server-metrics')
+const ServerMetrics = require('../service/server-metrics')
 const Message = require('../message')
 const Event = require('../event')
 const kc = require('kebab-case')
@@ -175,6 +175,9 @@ module.exports = class Server extends EventEmitter {
    * @private
    */
   _methodHandler(req, res, next) {
+
+    let $this = this
+
     // Update metrics
     this.metrics.methodsCount++
 
@@ -212,7 +215,7 @@ module.exports = class Server extends EventEmitter {
       // Reply with the response
       res.json(data)
       next()
-    })
+    }, $this)
   }
 
   /**
