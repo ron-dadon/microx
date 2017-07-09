@@ -5,14 +5,14 @@ Microservices framework for Node.js
 microX is under ongoing development
 
 #### What is microX?
-Microservices architecture adaptation is growing event day, making the agile development process easier and more productive
-but comes with a cost - each service is simple, but managing an entire eco-system of micro services is
+Microservices architecture adaptation is growing every day, making the agile development process easier and more productive
+but comes with a cost - each service is simple, but managing an entire eco-system of microservices is
 not a walk in the park. There are many known and highly adapted solutions, such as Sensca, but when I started my journey with
 microservices I've discovered that almost non of the framework / toolkit out there gives the entire solution.
  
-And then microX came along. It started as a self learning experience, but after it was completed, I've decided to give it a test
-run on a production project. Sure, it is not the fastest (TCP based framework are much faster) as it is built on top of HTTP using
-express framework, but the simplicity of using it and scaling it makes it a good tool for rapid development.
+And then microX came along. This project is for self learning experience, but after it will be completed, I will give it a test
+run on a production project. Sure, it is not the fastest as it is built on top of HTTP using
+express framework (TCP based frameworks are much faster), but the simplicity of using it and scaling it makes it a good tool for rapid development.
  
 #### Basic Architecture
 microX is based on a service registry and client services. The registry is the one place that holds the information regarding the
