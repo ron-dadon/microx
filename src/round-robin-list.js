@@ -2,7 +2,10 @@
  * Created by Ron on 05/07/2017.
  */
 
-module.exports = class RoundRobinList extends Array {
+/**
+ * A simple array with a function that returns the elements within the array using Round-Robin algorithm
+ */
+class RoundRobinList extends Array {
 
     getNext() {
         if (this.nextIndex === undefined) {
@@ -17,3 +20,5 @@ module.exports = class RoundRobinList extends Array {
     }
 
 }
+
+module.exports = RoundRobinList

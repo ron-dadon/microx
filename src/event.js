@@ -3,9 +3,8 @@
  */
 
 const uuid = require('./uuid')
-const kc = require('kebab-case')
 
-module.exports = class Event {
+class Event {
 
   constructor(name, data, emitter) {
     if (typeof name === 'object') {
@@ -17,7 +16,8 @@ module.exports = class Event {
       this.time = Date.now()
       this.emitter = emitter
     }
-    this.name = kc(this.name)
   }
 
 }
+
+module.exports = Event

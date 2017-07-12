@@ -2,7 +2,10 @@
  * Created by Ron on 05/07/2017.
  */
 
-module.exports = class Queue {
+/**
+ * Implementation of a queue using a simple array
+ */
+class Queue {
 
     constructor() {
         this.items = []
@@ -25,3 +28,5 @@ module.exports = class Queue {
         return this.items.length
     }
 }
+
+module.exports = Queue

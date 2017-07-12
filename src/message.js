@@ -4,12 +4,15 @@
 
 const uuid = require('./uuid')
 
-module.exports = class Message {
+class Message {
 
-  constructor(data, id) {
+  constructor(data, id, from) {
     this.id = id || uuid()
     this.data = data
     this.time = Date.now()
+    this.from = from
   }
 
 }
+
+module.exports = Message
