@@ -15,15 +15,12 @@ run on a production project. Sure, it is not the fastest as it is built on top o
 express framework (TCP based frameworks are much faster), but the simplicity of using it and scaling it makes it a good tool for rapid development.
  
 #### Basic Architecture
-microX is based on a service registry and client services. The registry is the one place that holds the information regarding the
-location of all the services, and it is then used by the services to fetch other services locations and broadcast and receive events.
+microX is based on a pub - sub protocol using Redis for service discovery. Instead of having a central registry service that
+holds all the services locations, each time a service is going up is publishes itself to all the other services.
+Each service in that case holds a complete map of the services eco-system, making the central registry redundant and making each service more de-coupled from others.
+The only dependency for each service is the Redis server location.
  
-Because of that, the registry is a weak spot in the system and can be a bottle neck. To tackle this, microX registry uses
-Redis for storing the services meta data and the events queues, so if a registry server is highly loaded, another once can be
-started, and a basic load balancer such as Nginx can be used to balance them.
- 
-A service can call other services by their name & version, without known the location of the service. When a service calls another
-service, it first asks the registry for a location of an instance of this service, and than perform the communication directly with
-the service. This can improve performance over a standard broker based solutions, where the broker receives the calls and performs
+A service can call other services by their name & version. When a service calls another
+service, it perform the communication directly with the service according to the service map it holds. This can improve performance over a standard broker based solutions, where the broker receives the calls and performs
 the forwarding to the required service, causing each call to go through at least 2 servers, where in microX once a service
-knows the location of another service, it can store it and use the same information for future calls (like a cache, with a defined expiration).
+knows the location of another service, it contacts it directly.
