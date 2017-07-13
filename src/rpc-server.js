@@ -4,6 +4,7 @@
 
 const express = require('express')
 const jsonBodyParser = require('body-parser').json
+const cors = require('cors')
 const Message = require('./message')
 
 class RpcServer {
@@ -15,6 +16,7 @@ class RpcServer {
   constructor(service) {
     this.service = service
     this.app = express()
+    this.app.use(cors())
     this.app.use(jsonBodyParser())
     this.server = null
     this.methodHandlers = {}

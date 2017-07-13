@@ -232,7 +232,7 @@ class Service extends EventEmitter {
    * @param {Object} [data] Data to send
    * @param {Message} [parentMessage] Parent message in case of cascaded calls for request tracking
    *
-   * @returns {*}
+   * @returns {Promise}
    */
   call(service, method, data, parentMessage) {
 

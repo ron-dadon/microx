@@ -27,13 +27,11 @@ class RoundRobinMap {
   }
 
   getNext() {
-    let keys = Object.keys(this.items)
-    let key = keys[this.nextIndex]
-    this.nextIndex++
-    if (this.nextIndex >= keys.length) {
-      this.nextIndex = 0
+    let values = Object.values(this.items)
+    if (this.lastIndex >= values.length) {
+      this.lastIndex = 0
     }
-    return this.get(key)
+    return values[this.lastIndex++]
   }
 
   count() {
