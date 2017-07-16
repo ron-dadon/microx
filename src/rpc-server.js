@@ -27,14 +27,14 @@ class RpcServer {
 
   /**
    * Start the server
-   * The server will listen on the port and host as specified in the service meta properties
+   * The server will listen on the port as specified in the service meta properties
    *
    * @returns {Promise}
    */
   start() {
     return new Promise((function(res, rej) {
       try {
-        this.server = this.app.listen(this.service.meta.port, this.service.meta.host, res)
+        this.server = this.app.listen(this.service.meta.port, res)
         this.running = true
       } catch (e) {
         rej(e)

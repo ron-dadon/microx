@@ -14,6 +14,7 @@ const Event = require('./../event').Event
 const EventMeta = require('./../event').EventMeta
 const MulticastEvent = require('./../event').MulticastEvent
 const RoundRobinMap = require('./../round-robin-map')
+const Queue = require('./../queue')
 
 const FrameworkEvents = {
   BROADCAST: '__broadcast',
@@ -58,6 +59,7 @@ class Service extends EventEmitter {
     this._multicastHandlers = {}
     this._generalMulticastHandler = null
     this.services = {}
+    this.servicesEvents = {}
     this._multicastRepeater = null
 
     this.subClient.on('message', _messageHandler.bind(this))
@@ -79,6 +81,9 @@ class Service extends EventEmitter {
       }
       meta.lastPing = Date.now()
       this.services[meta.versionName].push(meta.id, meta)
+      if (!this.servicesEvents[meta.versionName]) {
+        this.servicesEvents[meta.versionName] = new Queue()
+      }
       this.emit(EVENTS.SERVICE_PING, meta)
     }
 
@@ -93,6 +98,7 @@ class Service extends EventEmitter {
         this.services[meta.versionName].remove(meta.id)
         if (this.services[meta.versionName].count() === 0) {
           delete this.services[meta.versionName]
+          delete this.servicesEvents[meta.versionName]
         }
         this.emit(EVENTS.SERVICE_REMOVED, meta)
       }
@@ -146,6 +152,7 @@ class Service extends EventEmitter {
         }
         if (this.services[serviceCollection].count() === 0) {
           delete this.services[serviceCollection]
+          delete this.servicesEvents[serviceCollection]
         }
       }
       this.emit(EVENTS.SERVICE_CLEAN, this.services)
@@ -267,10 +274,13 @@ class Service extends EventEmitter {
     let eventObj = new Event(event, data, eventMeta)
 
     // Go over all the services and broadcast to all of them
-    for (let serviceCollection in this.services) {
-      if (!this.services.hasOwnProperty(serviceCollection)) continue
-      this.call(serviceCollection, FrameworkCalls.EVENT, eventObj)
+    for (let serviceCollection in this.servicesEvents) {
+      if (!this.servicesEvents.hasOwnProperty(serviceCollection)) continue
+      this.servicesEvents[serviceCollection].push(eventObj)
     }
+
+    process.nextTick(this._processEvent.bind(this))
+
   }
 
   /**
@@ -331,6 +341,30 @@ class Service extends EventEmitter {
   _reactAll(handler) {
     this._generalMulticastHandler = handler
     this.subClient.psubscribe('*')
+  }
+
+  _processEvent() {
+
+    let moreEvents = false
+
+    // Go over all the services and broadcast to all of them
+    for (let serviceCollection in this.servicesEvents) {
+      if (!this.servicesEvents.hasOwnProperty(serviceCollection)) continue
+      let event = this.servicesEvents[serviceCollection].peek()
+      this.call(serviceCollection, FrameworkCalls.EVENT, event).then(clearEvent(serviceCollection).bind(this)).catch(() => {})
+    }
+
+    if (moreEvents) {
+      process.nextTick(this._processEvent.bind(this))
+    }
+
+    function clearEvent(serviceCollection) {
+      return (function() {
+        this.servicesEvents[serviceCollection].pop()
+        moreEvents |= !!this.servicesEvents[serviceCollection].length()
+      }).bind(this)
+    }
+
   }
 
 }
