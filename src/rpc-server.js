@@ -112,8 +112,21 @@ class RpcServer {
    */
   _eventHandler(msg, reply) {
 
+    // Find if any * events listeners exists that match the event name
+    let regexEvents = {}
+
+    for (let eventKey in this.eventHandlers) {
+      if (!this.eventHandlers.hasOwnProperty(eventKey)) continue
+      if (eventKey.indexOf('*') >= 0) {
+        let regex = new RegExp(eventKey.replace(/\*/g, '.*'))
+        if (regex.test(msg.data.name)) {
+          regexEvents[eventKey] = true
+        }
+      }
+    }
+
     // Ignore event that the server does not listen to
-    if (!this.eventHandlers[msg.data.name]) return
+    if (!this.eventHandlers[msg.data.name] && Object.keys(regexEvents).length === 0) return
 
     // Update events metrics
     this.service.metrics.eventsCount++
@@ -124,9 +137,17 @@ class RpcServer {
     }
     this.service.metrics.events[msg.data.name]++
 
-    // Call the event handler, and wait for the reply function to be called
-    this.eventHandlers[msg.data.name](msg.data)
+    // Call the event handler or / and the matched * handlers
+    if (this.eventHandlers[msg.data.name]) {
+      this.eventHandlers[msg.data.name](msg.data)
+    }
+    for (let eventKey in regexEvents) {
+      if (!regexEvents.hasOwnProperty(eventKey)) continue
+      this.eventHandlers[eventKey](msg.data)
+    }
 
+    // wait for the reply function to be called to notify the sending service that the event was handled
+    // this is critical for clearing the event from the queue in the sending service
     reply()
   }
 
