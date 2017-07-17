@@ -16,7 +16,7 @@ myService.provide('get', function sum(msg, reply) {
 })
 
 // Listen to update math.op event
-myService.onEvent('math.op', function(event) {
+myService.onEvent('math.*', function(event) {
   lastEvents.push(event)
   if (lastEvents.length > 5) {
     lastEvents.splice(0, lastEvents.length - 5)

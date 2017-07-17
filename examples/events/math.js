@@ -14,7 +14,7 @@ myService.provide('sum', function sum(msg, reply) {
   let y = msg.data.y || 0
 
   // Broadcast an event to other services about the operation that was performed
-  myService.broadcast('math.op', {message: 'Math did sum operation', result: x + y})
+  myService.broadcast('math.sum', {message: 'Math did sum operation', result: x + y})
   reply(null, {result: x + y})
 })
 
@@ -25,7 +25,7 @@ myService.provide('multi', function multi(msg, reply) {
   let y = msg.data.y || 0
 
   // Broadcast an event to other services about the operation that was performed
-  myService.broadcast('math.op', {message: 'Math did multiple operation', result: x * y})
+  myService.broadcast('math.multi', {message: 'Math did multiple operation', result: x * y})
 
   reply(null, {result: x * y})
 })
