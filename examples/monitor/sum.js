@@ -4,8 +4,14 @@
 
 const Service = require('../../')
 
+let myServiceConfig = new Service.ServiceConfiguration({
+  name: 'Service Sum',
+  port: 8081,
+  host: 'localhost'
+});
+
 // Define the service instance
-let myService = new Service('Service Sum', '1.0', 8081, '127.0.0.1', false)
+let myService = new Service(myServiceConfig)
 
 // Provide a method in the service
 // The method will get 2 parameters, x and y and will return the sum of them

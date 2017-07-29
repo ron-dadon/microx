@@ -5,7 +5,11 @@
 const Service = require('../../')
 
 // Define the service instance
-let myService = new Service('math', '1.0', 8082, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name:'math',
+  port: 8082,
+  host: '127.0.0.1'
+}))
 
 // Provide a sum method in the service
 // The method will get 2 parameters, x and y and will return the sum of them

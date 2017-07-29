@@ -28,6 +28,10 @@ class Queue {
     return this.items.length
   }
 
+  toArray() {
+    return this.items;
+  }
+
 }
 
 module.exports = Queue

@@ -8,7 +8,11 @@ const Service = require('../../')
 let app = express()
 
 // Define the service instance
-let myService = new Service('gw', '1.0', 8081, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name: 'gw',
+  port: 8081,
+  host: '127.0.0.1'
+}))
 
 // Define the GW server
 // The endpoint will call the math service to get answers

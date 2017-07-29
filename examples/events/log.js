@@ -7,7 +7,11 @@ const Service = require('../../')
 let lastEvents = []
 
 // Define the service instance
-let myService = new Service('log', '1.0', 8083, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name: 'log',
+  port: 8083,
+  host: '127.0.0.1'
+}))
 
 // Provide a get method in the service
 // The method will return the last 5 events logged in the system

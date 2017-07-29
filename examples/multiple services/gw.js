@@ -8,7 +8,11 @@ const Service = require('../../')
 let app = express()
 
 // Define the service instance
-let myService = new Service('Monitor', '1.0', 8081, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name: 'GW',
+  port: 8081,
+  host: '127.0.0.1'
+}))
 
 // Define the GW server
 // The endpoint will call the math service to get answers
@@ -31,17 +35,19 @@ app.post('/multi', function(req, res) {
   })
 })
 
-// Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function() {
-  console.log('Service GW started')
+// Listen to start event, display a log and start the GW
+myService.on(Service.EVENTS.SERVICE_START, function () {
+  console.log('Service %s started', this.meta.name)
   app.listen(8080, function() {
-    "use strict";
     console.log('Gateway is up')
   })
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, process.exit)
+myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+  console.log('Service %s stopped', this.meta.name)
+  process.exit()
+})
 
 // Start the service
 myService.start()

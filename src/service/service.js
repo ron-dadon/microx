@@ -6,6 +6,7 @@ const EventEmitter = require('events')
 
 const Redis = require('ioredis')
 const request = require('request')
+const semver = require('semver')
 
 const ServiceMeta = require('./service-meta')
 const ServiceMetrics = require('./server-metrics')
@@ -46,13 +47,34 @@ const EVENTS = {
   SERVICE_PING_ERROR: 'service ping error',
 }
 
+class ServiceConfiguration {
+
+  constructor(opt) {
+    this.name = opt.name || ''
+    this.version = opt.version || '1.0.0'
+    this.port = opt.port || 8080
+    this.host = opt.host || 'localhost'
+    this.secure = opt.secure || false
+    this.redisConfig = opt.redisConfig || {}
+
+    if (!semver.valid(this.version)) {
+      throw new Error('Invalid version. Version must follow semantic version specifications')
+    }
+  }
+
+}
+
 class Service extends EventEmitter {
 
-  constructor(name, version, port, host, secure, redisConfig) {
+  constructor(opt) {
     super()
-    this.meta = new ServiceMeta(name, version, port, host, secure)
+    // Make sure opt is a service configuration object
+    if (!(opt instanceof ServiceConfiguration)) {
+      opt = new ServiceConfiguration(opt)
+    }
+    this.meta = new ServiceMeta(opt.name, opt.version, opt.port, opt.host, opt.secure)
     this.metrics = new ServiceMetrics()
-    this.redisConfig = redisConfig
+    this.redisConfig = opt.redisConfig
     this.pubClient = new Redis(this.redisConfig)
     this.subClient = new Redis(this.redisConfig)
     this.server = new Server(this)
@@ -60,6 +82,7 @@ class Service extends EventEmitter {
     this._multicastHandlers = {}
     this._generalMulticastHandler = null
     this.services = {}
+    this._defaultVersions = {}
     this.servicesEvents = {}
     this._multicastRepeater = null
 
@@ -81,6 +104,13 @@ class Service extends EventEmitter {
         this.services[meta.versionName] = new RoundRobinMap()
       }
       meta.lastPing = Date.now()
+      if (this._defaultVersions[meta.name]) {
+        if (semver.gt(meta.version, this._defaultVersions[meta.name])) {
+          this._defaultVersions[meta.name] = meta.version
+        }
+      } else {
+        this._defaultVersions[meta.name] = meta.version
+      }
       this.services[meta.versionName].push(meta.id, meta)
       if (!this.servicesEvents[meta.versionName]) {
         this.servicesEvents[meta.versionName] = new Queue()
@@ -100,6 +130,7 @@ class Service extends EventEmitter {
         if (this.services[meta.versionName].count() === 0) {
           delete this.services[meta.versionName]
           delete this.servicesEvents[meta.versionName]
+          delete this._defaultVersions[meta.name]
         }
         this.emit(EVENTS.SERVICE_REMOVED, meta)
       }
@@ -251,6 +282,12 @@ class Service extends EventEmitter {
    */
   call(service, method, data, parentMessage) {
 
+    // Use default version if no version is set
+    // The default version will be the latest version or fallback to 1.0.0
+    if (service.indexOf('@') < 0) {
+      service += '@' + (this._defaultVersions[service] || '1.0.0')
+    }
+
     // Check if service exists
     if (!this.services[service]) {
       let err = new Error('Unknown service')
@@ -318,6 +355,34 @@ class Service extends EventEmitter {
     // Assign server event handler
     this.server.onEvent(event, handler)
     return this
+  }
+
+  /**
+   * Return an array of all known services
+   *
+   * @returns {Array}
+   */
+  getServices() {
+    let list = []
+    for (let service in this.services) {
+      if (!this.services.hasOwnProperty(service)) continue
+      list = list.concat(this.services[service].toArray())
+    }
+    return list;
+  }
+
+  /**
+   * Return the pending events queues
+   *
+   * @returns {{}|*}
+   */
+  getEventsQueues() {
+    let list = {}
+    for (let service in this.servicesEvents) {
+      if (!this.servicesEvents.hasOwnProperty(service)) continue
+      list[service] = this.servicesEvents[service].toArray()
+    }
+    return this.servicesEvents
   }
 
   /**
@@ -394,5 +459,6 @@ class Service extends EventEmitter {
 }
 
 Service.EVENTS = EVENTS
+Service.ServiceConfiguration = ServiceConfiguration
 
 module.exports = Service

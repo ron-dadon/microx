@@ -5,7 +5,11 @@
 const Service = require('../../')
 
 // Define the service instance
-let myService = new Service('math', '1.0', 8082, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name: 'math',
+  port: 8082,
+  host: '127.0.0.1'
+}))
 
 // Provide a sum method in the service
 // The method will get 2 parameters, x and y and will return the sum of them
@@ -24,12 +28,15 @@ myService.provide('multi', function multi(msg, reply) {
 })
 
 // Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function() {
-    console.log('Service started')
+myService.on(Service.EVENTS.SERVICE_START, function () {
+  console.log('Service %s started', this.meta.name)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, process.exit)
+myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+  console.log('Service %s stopped', this.meta.name)
+  process.exit()
+})
 
 // Start the service
 myService.start()

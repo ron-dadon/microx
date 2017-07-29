@@ -5,18 +5,17 @@
 const Service = require('../../')
 
 // Define the service instance
-let myService = new Service('Monitor', '1.0', 8080, '127.0.0.1', false)
+let myService = new Service(new Service.ServiceConfiguration({
+  name: 'Monitor',
+  port: 8080,
+  host: '127.0.0.1'
+}))
 
 // Provide a method in the service
 // The method will get 2 parameters, x and y and will return the sum of them
 myService.provide('getServices', function sum(msg, reply) {
-  let list = []
-  for (let service in myService.services) {
-    if (!myService.services.hasOwnProperty(service)) continue
-    list = list.concat(myService.services[service].toArray())
-  }
   // Output the list of all known services
-  reply(null, list)
+  reply(null, myService.getServices())
 })
 
 // Listen to start event and display a log
