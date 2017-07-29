@@ -5,6 +5,7 @@
 const EventEmitter = require('events')
 
 const Redis = require('ioredis')
+const request = require('request')
 
 const ServiceMeta = require('./service-meta')
 const ServiceMetrics = require('./server-metrics')
@@ -225,6 +226,13 @@ class Service extends EventEmitter {
     }).bind(this))
   }
 
+  /**
+   * Provide a method via the service
+   *
+   * @param {String} method The method name
+   * @param {Function} handler The method handler
+   * @returns {Service}
+   */
   provide(method, handler) {
     this.server.provide(method, handler)
     return this
@@ -260,6 +268,22 @@ class Service extends EventEmitter {
 
     // Perform the call
     return this.client.call(instance.url, method, data, parentMessage)
+  }
+
+  /**
+   * A wrapper for request module
+   * Returns a promise
+   *
+   * @param {Object} options Request module options
+   * @returns {Promise}
+   */
+  httpRequest(options) {
+    return new Promise((res, rej) => {
+      request(options, (err, response) => {
+        if (err) return rej(err)
+        return res(response)
+      })
+    })
   }
 
   /**
