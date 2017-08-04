@@ -126,7 +126,7 @@ The event gets the error object
 
 See the following examples for better understanding of how to use microX.
 
-1) Simple service
-2) Multiple services
-3) Events
-4) Monitoring
+1. Simple service
+2. Multiple services
+3. Events
+4. Monitoring
