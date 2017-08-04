@@ -4,7 +4,7 @@ Microservices framework for Node.js
 ## UNDER DEVELOPMENT
 microX is under ongoing development
 
-#### What is microX?
+### What is microX?
 Microservices architecture adaptation is growing every day, making the agile development process easier and more productive
 but comes with a cost - each service is simple, but managing an entire eco-system of microservices is
 not a walk in the park. There are many known and highly adapted solutions, such as Sensca, but when I started my journey with
@@ -14,7 +14,7 @@ This project is for self learning experience, but after it will be completed, I 
 run on a production project. Sure, it is not the fastest as it is built on top of HTTP using
 express framework (TCP based frameworks are much faster), but the simplicity of using it and scaling it makes it a good tool for rapid development.
  
-#### Basic Architecture
+### Basic Architecture
 microX is based on a pub - sub protocol using Redis for service discovery. Instead of having a central registry service that
 holds all the services locations, each time a service is going up is publishes itself to all the other services.
 Each service in that case holds a complete map of the services eco-system, making the central registry redundant and making each service more de-coupled from others.
@@ -25,7 +25,7 @@ service, it perform the communication directly with the service according to the
 the forwarding to the required service, causing each call to go through at least 2 servers, where in microX once a service
 knows the location of another service, it contacts it directly.
 
-#### Installation
+### Installation
 
 Install microX is very simple using npm.
 
@@ -33,12 +33,12 @@ Install microX is very simple using npm.
 $ npm install microx --save
 ```
 
-#### Usage
+### Usage
 
 microX module provides one simple constructor, the `Service` constructor.
 The returned instance encapsulates all the required functionally to build a fully functional service.
 
-##### Initialization
+#### Initialization
 
 ```js
 const Service = require('microx')
@@ -59,70 +59,70 @@ Create an configuration object, you can use a simple object or the `Service.Serv
 To start your micro-service, call the `start` method.
 You can stop the service, by calling the `stop` method.
 
-##### Events
+#### Events
 
 The `Service` constructor extends the `EventsEmitter` constructor. The following events are emitted by the `Service`:
 
-###### service start
+##### service start
 Emitted when the service start method finished all the required processing and the service is ready to accept requests
 
-###### service stopped
+##### service stopped
 Emitted when the service stop method finished all the required processing and the service is no longer able to accept new requests
 
-###### service ping
+##### service ping
 Emitted when another service has pinged the service
 The event gets the pinging service meta object
 
-###### call service error
+##### call service error
 Emitted when the service called another service and an error occurred
 
-###### call unknown service
+##### call unknown service
 Emitted when the service called a service that it does not know its location
 
-###### rpc server started
+##### rpc server started
 Emitted when the RPC HTTP server started listening
 
-###### rpc server error
+##### rpc server error
 Emitted when the RPC HTTP server got an error
 
-###### rpc server stopped
+##### rpc server stopped
 Emitted when the RPC HTTP server stopped listening
 
-###### service remove error
+##### service remove error
 Emitted when the service failed to send REMOVE multicast 
 The event gets the error object
 
-###### service remove sent
+##### service remove sent
 Emitted when the service sent REMOVE multicast
 
-###### service removed
+##### service removed
 Emitted when the service got a REMOVE multicast from another service and removed that service from the locations map
 The event gets the removed service meta object
 
-###### service message
+##### service message
 Emitted when the service got a multicast message from another service
 The event gets the message object
 
-###### services clean
+##### services clean
 Emitted when the service has finished a locations & versions maps cleaning to remove irrelevant services
 
-###### service ping interval started
+##### service ping interval started
 Emitted when the service started his pinging interval timer
 The event gets the interval value
 
-###### service ping interval stopped
+##### service ping interval stopped
 Emitted when the service stopped his pinging interval timer
 
-###### service ping sent
+##### service ping sent
 Emitted when the service sent a PING multicast message
 The event gets the service meta object
 
-###### service ping error
+##### service ping error
 Emitted when the service failed to send a PING multicast message
 The event gets the error object
 
 
-#### Examples
+### Examples
 
 See the following examples for better understanding of how to use microX.
 
