@@ -20,11 +20,14 @@ myService.provide('getServices', function sum(msg, reply) {
 
 // Listen to start event and display a log
 myService.on(Service.EVENTS.SERVICE_START, function() {
-  console.log('Service started')
+  console.log('Service %s@%s started', this.meta.name, this.meta.version)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, process.exit)
+myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+  console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
+  process.exit()
+})
 
 // Start the service
 myService.start()

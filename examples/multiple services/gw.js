@@ -37,7 +37,7 @@ app.post('/multi', function(req, res) {
 
 // Listen to start event, display a log and start the GW
 myService.on(Service.EVENTS.SERVICE_START, function () {
-  console.log('Service %s started', this.meta.name)
+  console.log('Service %s@%s started', this.meta.name, this.meta.version)
   app.listen(8080, function() {
     console.log('Gateway is up')
   })
@@ -45,7 +45,7 @@ myService.on(Service.EVENTS.SERVICE_START, function () {
 
 // Listen to stop event and exit the process
 myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
-  console.log('Service %s stopped', this.meta.name)
+  console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
   process.exit()
 })
 

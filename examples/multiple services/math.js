@@ -29,12 +29,12 @@ myService.provide('multi', function multi(msg, reply) {
 
 // Listen to start event and display a log
 myService.on(Service.EVENTS.SERVICE_START, function () {
-  console.log('Service %s started', this.meta.name)
+  console.log('Service %s@%s started', this.meta.name, this.meta.version)
 })
 
 // Listen to stop event and exit the process
 myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
-  console.log('Service %s stopped', this.meta.name)
+  console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
   process.exit()
 })
 

@@ -20,7 +20,7 @@ let myService = new Service(new Service.ServiceConfiguration({
 app.use(bodyParser.json())
 
 app.post('/sum', function(req, res) {
-  myService.call('math@1.0', 'sum', req.body).then(function(msg) {
+  myService.call('math', 'sum', req.body).then(function(msg) {
     res.json(msg.data)
   }).catch(function(err) {
     res.status(err.statusCode || 500).json(err.message)
@@ -45,15 +45,17 @@ app.get('/last', function(req, res) {
 
 // Listen to start event and display a log
 myService.on(Service.EVENTS.SERVICE_START, function() {
-  console.log('Service GW started')
+  console.log('Service %s@%s started', this.meta.name, this.meta.version)
   app.listen(8080, function() {
-    "use strict";
     console.log('Gateway is up')
   })
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, process.exit)
+myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+  console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
+  process.exit()
+})
 
 // Start the service
 myService.start()

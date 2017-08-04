@@ -43,8 +43,84 @@ The returned instance encapsulates all the required functionally to build a full
 ```js
 const Service = require('microx')
 
-let serviceInstance = new Service();
+let configuration = new Service.ServiceConfiguration({
+  name: 'sample service',
+  port: 8080,
+  host: '127.0.0.1'
+})
+
+let serviceInstance = new Service(configuration);
+
+serviceInstance.start()
 ```
+
+Create an configuration object, you can use a simple object or the `Service.ServiceConfiguration` constructor to validate the configuration object and setup default values.
+
+To start your micro-service, call the `start` method.
+You can stop the service, by calling the `stop` method.
+
+##### Events
+
+The `Service` constructor extends the `EventsEmitter` constructor. The following events are emitted by the `Service`:
+
+###### service start
+Emitted when the service start method finished all the required processing and the service is ready to accept requests
+
+###### service stopped
+Emitted when the service stop method finished all the required processing and the service is no longer able to accept new requests
+
+###### service ping
+Emitted when another service has pinged the service
+The event gets the pinging service meta object
+
+###### call service error
+Emitted when the service called another service and an error occurred
+
+###### call unknown service
+Emitted when the service called a service that it does not know its location
+
+###### rpc server started
+Emitted when the RPC HTTP server started listening
+
+###### rpc server error
+Emitted when the RPC HTTP server got an error
+
+###### rpc server stopped
+Emitted when the RPC HTTP server stopped listening
+
+###### service remove error
+Emitted when the service failed to send REMOVE multicast 
+The event gets the error object
+
+###### service remove sent
+Emitted when the service sent REMOVE multicast
+
+###### service removed
+Emitted when the service got a REMOVE multicast from another service and removed that service from the locations map
+The event gets the removed service meta object
+
+###### service message
+Emitted when the service got a multicast message from another service
+The event gets the message object
+
+###### services clean
+Emitted when the service has finished a locations & versions maps cleaning to remove irrelevant services
+
+###### service ping interval started
+Emitted when the service started his pinging interval timer
+The event gets the interval value
+
+###### service ping interval stopped
+Emitted when the service stopped his pinging interval timer
+
+###### service ping sent
+Emitted when the service sent a PING multicast message
+The event gets the service meta object
+
+###### service ping error
+Emitted when the service failed to send a PING multicast message
+The event gets the error object
+
 
 #### Examples
 

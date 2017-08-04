@@ -133,6 +133,7 @@ class Service extends EventEmitter {
           delete this._defaultVersions[meta.name]
         }
         this.emit(EVENTS.SERVICE_REMOVED, meta)
+        _cleanServices.call(this)
       }
     }
 
@@ -187,8 +188,40 @@ class Service extends EventEmitter {
           delete this.servicesEvents[serviceCollection]
         }
       }
+      _updateVersions.call(this)
       this.emit(EVENTS.SERVICE_CLEAN, this.services)
       setTimeout(_cleanServices.bind(this), 5000)
+    }
+
+    function _updateVersions() {
+      this._defaultVersions = {}
+      for (let serviceCollection in this.services) {
+        if (!this.services.hasOwnProperty(serviceCollection)) continue
+        let serviceSegments = serviceCollection.split('@')
+        if (!this._defaultVersions[serviceSegments[0]]) {
+          this._defaultVersions[serviceSegments[0]] = serviceSegments[1]
+        }
+        if (semver.gt(serviceSegments[1], this._defaultVersions[serviceSegments[0]])) {
+          this._defaultVersions[serviceSegments[0]] = serviceSegments[1]
+        }
+      }
+
+      // for (let service in this._defaultVersions) {
+      //   if (!this._defaultVersions.hasOwnProperty(service)) continue
+      //   let found = false
+      //   for (let serviceCollection in this.services) {
+      //     if (!this.services.hasOwnProperty(serviceCollection)) continue
+      //     let serviceSegments = serviceCollection.split('@')
+      //     if (serviceSegments[0] !== service) continue
+      //     found = true
+      //     if (semver.gt(serviceSegments[1], this._defaultVersions[service])) {
+      //       this._defaultVersions[service] = serviceSegments[1]
+      //     }
+      //   }
+      //   if (!found) {
+      //     delete this._defaultVersions[service]
+      //   }
+      // }
     }
 
   }

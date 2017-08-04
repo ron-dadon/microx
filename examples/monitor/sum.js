@@ -5,7 +5,7 @@
 const Service = require('../../')
 
 let myServiceConfig = new Service.ServiceConfiguration({
-  name: 'Service Sum',
+  name: 'Sum',
   port: 8081,
   host: 'localhost'
 });
@@ -23,11 +23,14 @@ myService.provide('sum', function sum(msg, reply) {
 
 // Listen to start event and display a log
 myService.on(Service.EVENTS.SERVICE_START, function() {
-    console.log('Service Sum started')
+    console.log('Service %s@%s started', this.meta.name, this.meta.version)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, process.exit)
+myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+  console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
+  process.exit()
+})
 
 // Start the service
 myService.start()
