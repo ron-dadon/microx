@@ -126,7 +126,7 @@ The event gets the error object
 
 See the following examples for better understanding of how to use microX.
 
-1. Simple service
-2. Multiple services
-3. Events
-4. Monitoring
+1. [Simple service](https://github.com/ron-dadon/microx/blob/master/examples/simple%20service/simple.js)
+2. [Multiple services](https://github.com/ron-dadon/microx/tree/master/examples/multiple%20services)
+3. [Events](https://github.com/ron-dadon/microx/tree/master/examples/events)
+4. [Monitoring](https://github.com/ron-dadon/microx/tree/master/examples/monitor)
