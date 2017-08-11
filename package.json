@@ -1,6 +1,6 @@
 {
   "name": "microx",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Micro-services framework for Node.js",
   "main": "index.js",
   "repository": "https://github.com/ron-dadon/microx.git",
