@@ -277,12 +277,20 @@ class Service extends EventEmitter {
   /**
    * Provide a method via the service
    *
-   * @param {String} method The method name
+   * @param {String|Object} method The method name or an object that provide a mapping from method names to handler functions
    * @param {Function} handler The method handler
    * @returns {Service}
    */
   provide(method, handler) {
-    this.server.provide(method, handler)
+    if (typeof method === 'object') {
+      for (let methodName in method) {
+        if (method.hasOwnProperty(methodName) && typeof method[methodName] === 'function') {
+          this.server.provide(methodName, method[methodName])
+        }
+      }
+    } else {
+      this.server.provide(method, handler)
+    }
     return this
   }
 
