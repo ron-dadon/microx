@@ -139,11 +139,11 @@ class RpcServer {
 
     // Call the event handler or / and the matched * handlers
     if (this.eventHandlers[msg.data.name]) {
-      this.eventHandlers[msg.data.name](msg.data)
+      this.eventHandlers[msg.data.name](msg.data, this.service)
     }
     for (let eventKey in regexEvents) {
       if (!regexEvents.hasOwnProperty(eventKey)) continue
-      this.eventHandlers[eventKey].call(this.service, msg.data)
+      this.eventHandlers[eventKey](msg.data, this.service)
     }
 
     // wait for the reply function to be called to notify the sending service that the event was handled
@@ -181,13 +181,13 @@ class RpcServer {
     let sourceMsg = new Message(req.body, req.headers)
 
     // Call the method handler, and wait for the reply function to be called
-    this.methodHandlers[req.params.method].call(this.service, sourceMsg, (function(err, data) {
+    this.methodHandlers[req.params.method](sourceMsg, (function(err, data) {
       if (err) {
         return next(err)
       }
       let responseMsg = new Message(data, sourceMsg.headers, this.service.meta.versionName)
       res.json(responseMsg)
-    }).bind(this))
+    }).bind(this), this.service)
   }
 
   /**

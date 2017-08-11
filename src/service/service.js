@@ -206,22 +206,6 @@ class Service extends EventEmitter {
         }
       }
 
-      // for (let service in this._defaultVersions) {
-      //   if (!this._defaultVersions.hasOwnProperty(service)) continue
-      //   let found = false
-      //   for (let serviceCollection in this.services) {
-      //     if (!this.services.hasOwnProperty(serviceCollection)) continue
-      //     let serviceSegments = serviceCollection.split('@')
-      //     if (serviceSegments[0] !== service) continue
-      //     found = true
-      //     if (semver.gt(serviceSegments[1], this._defaultVersions[service])) {
-      //       this._defaultVersions[service] = serviceSegments[1]
-      //     }
-      //   }
-      //   if (!found) {
-      //     delete this._defaultVersions[service]
-      //   }
-      // }
     }
 
   }
