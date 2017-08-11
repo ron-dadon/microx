@@ -2,7 +2,7 @@
 Microservices framework for Node.js
 
 ## UNDER DEVELOPMENT
-microX is under ongoing development
+microX is under ongoing development. **Breaking changes may occur at any time until the first stable version will be released.**
 
 ## What is microX?
 Microservices architecture adaptation is growing every day, making the agile development process easier and more productive
