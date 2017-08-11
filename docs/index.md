@@ -121,6 +121,37 @@ The event gets the service meta object
 Emitted when the service failed to send a PING multicast message
 The event gets the error object
 
+### Method Handler
+Each time a method is defined in a service, it should include a method handler function.
+The method handler function will get executed when another service performed a call to the method.
+
+The method handler will get 3 arguments:
+
+**Message**
+
+The incoming message object. The message object includes the data sent from the calling service and some extra meta data. See Message object definition.
+
+**Reply function**
+
+The reply function is used to reply to the calling service. The reply function is a common (err, data) callback, where the first argument is the Error object if an error occurred, or null if everything is OK and the second object is the data to reply with in case of success.
+
+**Service instance**
+
+The current service instance is passed as the third argument to provide the developer with an option to perform service method calls from the handler such as broadcasting an event, calling another service method etc.
+
+### Event Handler
+Each time an event listener is defined in a service, it should include an event handler function.
+The event handler function will get executed when another service broadcast an event that match the event that is listened to.
+
+The event handler will get 2 arguments:
+
+**Event data**
+
+The data object that is sent in the event broadcast.
+
+**Service instance**
+
+The current service instance is passed as the second argument to provide the developer with an option to perform service method calls from the handler such as broadcasting an event, calling another service method etc.
 
 ### Examples
 
