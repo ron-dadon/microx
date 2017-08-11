@@ -181,13 +181,21 @@ class RpcServer {
     let sourceMsg = new Message(req.body, req.headers)
 
     // Call the method handler, and wait for the reply function to be called
-    this.methodHandlers[req.params.method](sourceMsg, (function(err, data) {
-      if (err) {
-        return next(err)
+    // reply function can be called only once, the following times will be ignored
+    this.methodHandlers[req.params.method](sourceMsg, replyGenerator(sourceMsg, this), this.service)
+
+    function replyGenerator(sourceMsg, context) {
+      let executed = false
+      return function(err, data) {
+        if (executed) return
+        if (err) {
+          return next(err)
+        }
+        let responseMsg = new Message(data, sourceMsg.headers, context.service.meta.versionName)
+        res.json(responseMsg)
+        executed = true
       }
-      let responseMsg = new Message(data, sourceMsg.headers, this.service.meta.versionName)
-      res.json(responseMsg)
-    }).bind(this), this.service)
+    }
   }
 
   /**
