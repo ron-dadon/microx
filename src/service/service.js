@@ -341,12 +341,15 @@ class Service extends EventEmitter {
   }
 
   /**
-   * Boradcast an event to the other services
+   * Broadcast an event to the other services
    *
-   * @param event
-   * @param data
+   * @param {String} event The name of the event
+   * @param {Object} data The event payload object
    */
   broadcast(event, data) {
+    if (event.indexOf(this.meta.name + '.') !== 0) {
+      event = this.meta.name + '.' + event
+    }
     // Construct event object
     let eventMeta = new EventMeta(this.meta.versionName, this.meta.id)
     let eventObj = new Event(event, data, eventMeta)
