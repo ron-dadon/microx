@@ -139,19 +139,38 @@ The reply function is used to reply to the calling service. The reply function i
 
 The current service instance is passed as the third argument to provide the developer with an option to perform service method calls from the handler such as broadcasting an event, calling another service method etc.
 
+```js
+serviceInstance.provide('myMethod', handler)
+
+function handler(msg, reply, service) {
+  console.log(msg.data)
+  service.broadcast('myMethodHandlerCalled', msg.data)
+  reply(null, {status: 'OK'})
+}
+```
+
 ### Event Handler
 Each time an event listener is defined in a service, it should include an event handler function.
 The event handler function will get executed when another service broadcast an event that match the event that is listened to.
 
 The event handler will get 2 arguments:
 
-**Event data**
+**Event**
 
-The data object that is sent in the event broadcast.
+The event object that includes the data the was sent in the event broadcast.
 
 **Service instance**
 
 The current service instance is passed as the second argument to provide the developer with an option to perform service method calls from the handler such as broadcasting an event, calling another service method etc.
+
+```js
+serviceInstance.onEvent('myMethodHandlerCalled', eHandler)
+
+function eHandler(event, service) {
+  console.log(event.data)
+  // Use service if needed
+}
+```
 
 ### Examples
 
