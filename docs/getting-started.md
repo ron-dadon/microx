@@ -4,13 +4,13 @@ Building micro-services with microX is as easy as it gets.
 
 First, install microX using npm or yarn.
 
-```
+```sh
 $ npm install microx --save
 ```
 
 Now create a `.js` file, for example `index.js`, and require the `microx` module.
 
-```
+```js
 const Service = require('microx')
 ```
 
@@ -18,7 +18,7 @@ Requiring `microx` will return the `Service` constructor. We can use this constr
 
 Lets build a simple service, will call it `math`, and it will run on port 8000:
 
-```
+```js
 const Service = require('microx')
 
 let service = new Service({
@@ -33,7 +33,7 @@ We can now use the `provide` method to register a method handler in the service.
 
 Lets create a method `sum` that will add up 2 numbers.
 
-```
+```js
 const Service = require('microx')
 
 let service = new Service({
@@ -53,7 +53,7 @@ Our sum function is ready! The function validates the input data, and reply with
 
 All that is left is to start our service so it can accept calls from other services. We'll use the `start` method.
 
-```
+```js
 const Service = require('microx')
 
 let service = new Service({
