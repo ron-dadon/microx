@@ -22,6 +22,15 @@ service, it perform the communication directly with the service according to the
 the forwarding to the required service, causing each call to go through at least 2 servers, where in microX once a service
 knows the location of another service, it contacts it directly.
 
+## Prerequisites
+
+microX depends on Redis as the publish-subscribe engine that enables all the services to broadcast their states to other services.
+You need to have a Redis server up and running to run microX.
+When using the default Redis configuration (no authentication, localhost and default port), no Redis configuration is required in the module.
+If the Redis server requires authentication, is not on localhost and/or not using default port, please see [`ioredis`](https://github.com/luin/ioredis) documentation for the configuration options as `microX` uses `ioredis` for Redis integration.
+
+You can pass the configuration object for Redis in the service configuration object under `redisConfig` property.
+
 ## Installation
 
 Via NPM:
