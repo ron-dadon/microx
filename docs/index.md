@@ -36,6 +36,10 @@ Via YARN:
 $ yarn add microx
 ```
 
+## Getting Started
+
+Want to quickly get started with development? Follow microX [getting started](getting-started.html) guide.
+
 ## Usage
 
 microX module provides one simple constructor, the `Service` constructor.
