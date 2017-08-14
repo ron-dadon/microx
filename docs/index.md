@@ -1,10 +1,7 @@
-# microX
-Microservices framework for Node.js
-
 ## UNDER DEVELOPMENT
 microX is under ongoing development. **Breaking changes may occur at any time until the first stable version will be released.**
 
-### What is microX?
+## What is microX?
 Microservices architecture adaptation is growing every day, making the agile development process easier and more productive
 but comes with a cost - each service is simple, but managing an entire eco-system of microservices is
 not a walk in the park. There are many known and highly adapted solutions, such as Sensca, but when I started my journey with
@@ -14,7 +11,7 @@ This project is for self learning experience, but after it will be completed, I 
 run on a production project. Sure, it is not the fastest as it is built on top of HTTP using
 express framework (TCP based frameworks are much faster), but the simplicity of using it and scaling it makes it a good tool for rapid development.
  
-### Basic Architecture
+## Basic Architecture
 microX is based on a pub - sub protocol using Redis for service discovery. Instead of having a central registry service that
 holds all the services locations, each time a service is going up is publishes itself to all the other services.
 Each service in that case holds a complete map of the services eco-system, making the central registry redundant and making each service more de-coupled from others.
@@ -25,7 +22,7 @@ service, it perform the communication directly with the service according to the
 the forwarding to the required service, causing each call to go through at least 2 servers, where in microX once a service
 knows the location of another service, it contacts it directly.
 
-### Installation
+## Installation
 
 Via NPM:
 
@@ -39,12 +36,12 @@ Via YARN:
 $ yarn add microx
 ```
 
-### Usage
+## Usage
 
 microX module provides one simple constructor, the `Service` constructor.
 The returned instance encapsulates all the required functionally to build a fully functional service.
 
-#### Initialization
+### Initialization
 
 ```js
 const Service = require('microx')
@@ -65,73 +62,73 @@ Create an configuration object, you can use a simple object or the `Service.Serv
 To start your micro-service, call the `start` method.
 You can stop the service, by calling the `stop` method.
 
-#### Events
+### Events
 
 The `Service` constructor extends the `EventsEmitter` constructor. The following events are emitted by the `Service`:
 
-##### service start
+#### service start
 Emitted when the service start method finished all the required processing and the service is ready to accept requests
 
-##### service stopped
+#### service stopped
 Emitted when the service stop method finished all the required processing and the service is no longer able to accept new requests
 
-##### service ping
+#### service ping
 Emitted when another service has pinged the service
 The event gets the pinging service meta object
 
-##### call service error
+#### call service error
 Emitted when the service called another service and an error occurred
 
-##### call unknown service
+#### call unknown service
 Emitted when the service called a service that it does not know its location
 
-##### rpc server started
+#### rpc server started
 Emitted when the RPC HTTP server started listening
 
-##### rpc server error
+#### rpc server error
 Emitted when the RPC HTTP server got an error
 
-##### rpc server stopped
+#### rpc server stopped
 Emitted when the RPC HTTP server stopped listening
 
-##### service remove error
+#### service remove error
 Emitted when the service failed to send REMOVE multicast 
 The event gets the error object
 
-##### service remove sent
+#### service remove sent
 Emitted when the service sent REMOVE multicast
 
-##### service removed
+#### service removed
 Emitted when the service got a REMOVE multicast from another service and removed that service from the locations map
 The event gets the removed service meta object
 
-##### service message
+#### service message
 Emitted when the service got a multicast message from another service
 The event gets the message object
 
-##### services clean
+#### services clean
 Emitted when the service has finished a locations & versions maps cleaning to remove irrelevant services
 
-##### service ping interval started
+#### service ping interval started
 Emitted when the service started his pinging interval timer
 The event gets the interval value
 
-##### service ping interval stopped
+#### service ping interval stopped
 Emitted when the service stopped his pinging interval timer
 
-##### service ping sent
+#### service ping sent
 Emitted when the service sent a PING multicast message
 The event gets the service meta object
 
-##### service ping error
+#### service ping error
 Emitted when the service failed to send a PING multicast message
 The event gets the error object
 
-#### Methods
+### Methods
 
 The service instance exposes the following methods:
 
-##### provide
+#### provide
 
 The `provide` method accepts 2 arguments:
 
@@ -140,7 +137,7 @@ The `provide` method accepts 2 arguments:
 
 The `provide` method registers the method handler to the method name, so another service that will call this method will trigger the execution of the registered handler.
 
-##### broadcast
+#### broadcast
 
 The `broadcast` method accepts 2 arguments:
 
@@ -149,19 +146,19 @@ The `broadcast` method accepts 2 arguments:
 
 Broadcast an event to other services. The broadcasting service will not receive the event, but all other services that listens on the event will receive the event.
 
-##### start
+#### start
 
 Start the service RPC server and listen to incoming requests. Emit a `started` event to other services to add this instance or update the last appearance of the instance in the services map.
 
-##### stop
+#### stop
 
 Stop the service RPC server and publish a `stopped` event to other service to remove this instance from their services map.
 
-##### on
+#### on
 
 Register an event listener for internal events of the service (as listed above)
 
-##### call
+#### call
 
 Call another service
 
@@ -174,7 +171,7 @@ The `call` method accepts 2 arguments:
 
 The method returns a Promise that will be resolved if the method handler of the called method will reply without an error, or rejected if the called method replied with an error.
 
-##### httpRequest
+#### httpRequest
 
 A simple wrapper for `request` module. Used to call any third party HTTP based API.
 
@@ -182,11 +179,11 @@ The `httpRequest` method accepts a single argument, the `request` module options
 
 The method returns a Promise that will be rejected if the `request` callback returned an error and resolved with the response if no error occurred.
 
-##### getServices
+#### getServices
 
 Get an array of known services (service map)
 
-##### getEventsQueues
+#### getEventsQueues
 
 Get the list of all pending events
 
@@ -218,7 +215,7 @@ function handler(msg, reply, service) {
 }
 ```
 
-### Event Handler
+## Event Handler
 Each time an event listener is defined in a service, it should include an event handler function.
 The event handler function will get executed when another service broadcast an event that match the event that is listened to.
 
@@ -241,7 +238,7 @@ function eHandler(event, service) {
 }
 ```
 
-### Testing using HTTP client
+## Testing using HTTP client
 
 Each service exposes his methods via an HTTP server. If you wish to call a service method without a second service instance, you can use any simple HTTP client that can perform POST requests.
 
@@ -306,9 +303,9 @@ The response will be a JSON encoded Message object. For example:
 }
 ```
 
-### Objects
+## Objects
 
-#### Message
+### Message
 
 A message between 2 services.
 
@@ -320,7 +317,7 @@ The object fields:
 4. **time** - a milliseconds UNIX timestamp of the message
 5. **from** - the name and version of the service that created the message
 
-#### Event
+### Event
 
 An event object is created every time an event is broadcast. 
 
@@ -331,7 +328,7 @@ The object fields:
 3. **data** - the event payload data
 4. **meta** - the event meta data object.
 
-#### Event Meta
+### Event Meta
 
 A meta data that is attached to each Event object.
 
@@ -341,7 +338,7 @@ The object fields:
 2. **emitterId** - the unique ID of the service instance that emitted the event
 3. **time** - a milliseconds UNIX timestamp of the event
 
-#### Service Meta
+### Service Meta
 
 A meta data attached to the service instance. Available via the `meta` property.
 
@@ -357,7 +354,7 @@ The object fields:
 8. **secure** - is the service exposed via secure HTTPS connection
 9. **ttl** - how long (in seconds) the service is considered alive by other service - after each `ttl` seconds the service will publish itself again to the other services
 
-### Examples
+## Examples
 
 See the following examples for better understanding of how to use microX.
 
