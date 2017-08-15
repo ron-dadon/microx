@@ -17,6 +17,7 @@ const EventMeta = require('./../event').EventMeta
 const MulticastEvent = require('./../event').MulticastEvent
 const RoundRobinMap = require('./../round-robin-map')
 const Queue = require('./../queue')
+const Message = require('../message')
 
 const FrameworkEvents = {
   BROADCAST: '__broadcast',
@@ -85,6 +86,7 @@ class Service extends EventEmitter {
     this._defaultVersions = {}
     this.servicesEvents = {}
     this._multicastRepeater = null
+    this._mockupMethods = {}
 
     this.subClient.on('message', _messageHandler.bind(this))
 
@@ -294,6 +296,17 @@ class Service extends EventEmitter {
     return this
   }
 
+  mockup(service, method, handler) {
+
+    // Use default version if no version is set
+    // The default version will be the latest version or fallback to 1.0.0
+    if (service.indexOf('@') < 0) {
+      service += '@' + (this._defaultVersions[service] || '1.0.0')
+    }
+
+    this._mockupMethods[service + '#' + method] = handler
+  }
+
   /**
    * Call another service
    * Use round robin load balance to select the target instance
@@ -311,6 +324,22 @@ class Service extends EventEmitter {
     // The default version will be the latest version or fallback to 1.0.0
     if (service.indexOf('@') < 0) {
       service += '@' + (this._defaultVersions[service] || '1.0.0')
+    }
+
+    // Check if mockup method is defined
+    if (this._mockupMethods[service + '#' + method]) {
+      let msg = new Message(data, parentMessage.headers || {}, this.meta.versionName)
+      let mockup = this._mockupMethods[service + '#' + method]
+      let $this = this
+      return new Promise((res, rej) => {
+        mockup(msg, function(err, data) {
+          if (err) {
+            return rej(err)
+          }
+          let replyMsg = new Message(data, parentMessage.headers || {}, service)
+          res(replyMsg)
+        }, $this)
+      })
     }
 
     // Check if service exists
