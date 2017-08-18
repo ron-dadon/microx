@@ -280,7 +280,7 @@ class Service extends EventEmitter {
    * Provide a method via the service
    *
    * @param {String|Object} method The method name or an object that provide a mapping from method names to handler functions
-   * @param {Function} handler The method handler
+   * @param {Function} [handler] The method handler
    * @returns {Service}
    */
   provide(method, handler) {
@@ -296,6 +296,13 @@ class Service extends EventEmitter {
     return this
   }
 
+  /**
+   * Mockup another service method for development and debugging
+   *
+   * @param {String} service the name of the service
+   * @param {String} method the name of the method
+   * @param {Function} handler the handler function
+   */
   mockup(service, method, handler) {
 
     // Use default version if no version is set
