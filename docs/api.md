@@ -103,6 +103,16 @@ The `provide` method accepts 2 arguments:
 
 The `provide` method registers the method handler to the method name, so another service that will call this method will trigger the execution of the registered handler.
 
+#### mockup
+
+The `mockup` method accepts 3 arguments:
+
+1. **service** - the full name of the service to mockup (including version, otherwise will default to @1.0.0)
+2. **method** - the name of the method to mockup
+3. **handler** - the method handler function (see more below)
+
+The `mockup` method registers a mockup method handle. Calling the service-method combination will result in a local call to the mockup method instead of the real service.
+
 #### broadcast
 
 The `broadcast` method accepts 2 arguments:
