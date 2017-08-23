@@ -14,6 +14,7 @@
 ### NOTICE: UNDER DEVELOPMENT
 microX is under ongoing development. **Breaking changes may occur at any time until the first stable version will be released.**
 
+**BREAKING CHANGE** - starting from version 0.3.0 and above the module exports a factory method like most framework, where in version 0.2.* and lower the class `Service` was exported directly.
 ## What is microX?
 Microservices architecture adaptation is growing every day, making the agile development process easier and more productive
 but comes with a cost - each service is simple, but managing an entire eco-system of microservices is

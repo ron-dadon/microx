@@ -15,7 +15,7 @@ $ npm install microx --save
 Now create a `.js` file, for example `index.js`, and require the `microx` module.
 
 ```js
-const Service = require('microx')
+const microx = require('microx')
 ```
 
 Requiring `microx` will return the `Service` constructor. We can use this constructor to build our service instance.
@@ -23,9 +23,9 @@ Requiring `microx` will return the `Service` constructor. We can use this constr
 Lets build a simple service, will call it `math`, and it will run on port 8000:
 
 ```js
-const Service = require('microx')
+const microx = require('microx')
 
-let service = new Service({
+let service = microx({
   port: 8000,
   name: 'math'
 })
@@ -38,9 +38,9 @@ We can now use the `provide` method to register a method handler in the service.
 Lets create a method `sum` that will add up 2 numbers.
 
 ```js
-const Service = require('microx')
+const microx = require('microx')
 
-let service = new Service({
+let service = microx({
   port: 8000,
   name: 'math'
 })
@@ -58,9 +58,9 @@ Our sum function is ready! The function validates the input data, and reply with
 All that is left is to start our service so it can accept calls from other services. We'll use the `start` method.
 
 ```js
-const Service = require('microx')
+const microx = require('microx')
 
-let service = new Service({
+let service = microx({
   port: 8000,
   name: 'math'
 })

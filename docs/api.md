@@ -10,15 +10,15 @@ The returned instance encapsulates all the required functionally to build a full
 ### Initialization
 
 ```js
-const Service = require('microx')
+const microx = require('microx')
 
-let configuration = new Service.ServiceConfiguration({
+let configuration = {
   name: 'sample service',
   port: 8080,
   host: '127.0.0.1'
-})
+}
 
-let serviceInstance = new Service(configuration);
+let serviceInstance = microx(configuration);
 
 serviceInstance.start()
 ```
