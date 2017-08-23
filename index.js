@@ -4,4 +4,12 @@
 
 const Service = require('./src/service/service')
 
-module.exports = Service
+/**
+ * A factory method for creating service instances
+ *
+ * @param {Object} [opt] options object
+ * @returns {Service}
+ */
+module.exports = function createService(opt) {
+  return new Service(new Service.ServiceConfiguration(opt))
+}
