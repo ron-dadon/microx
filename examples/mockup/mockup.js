@@ -3,13 +3,14 @@
  */
 
 const Service = require('../../')
+const Events = require('../../').Service.EVENTS
 
 // Define the service instance
-let myService = new Service(new Service.ServiceConfiguration({
+let myService = microx({
   name: 'main-service',
   port: 8080,
   host: '127.0.0.1'
-}))
+})
 
 // Provide a method in the service
 // The method will get 2 parameters, x and y and will return the sum of them
@@ -28,12 +29,12 @@ myService.mockup('math', 'sum', function(msg, reply, service) {
 })
 
 // Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function () {
+myService.on(Events.SERVICE_START, function () {
   console.log('Service %s started', this.meta.name)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+myService.on(Events.SERVICE_STOPPED, function () {
   console.log('Service %s stopped', this.meta.name)
   process.exit()
 })

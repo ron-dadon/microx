@@ -13,3 +13,5 @@ const Service = require('./src/service/service')
 module.exports = function createService(opt) {
   return new Service(new Service.ServiceConfiguration(opt))
 }
+
+module.exports.Service = Service

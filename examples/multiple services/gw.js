@@ -3,16 +3,17 @@
  */
 const express = require('express')
 const bodyParser = require('body-parser')
-const Service = require('../../')
+const microx = require('../../')
+const Events = require('../../').Service.EVENTS
 
 let app = express()
 
 // Define the service instance
-let myService = new Service(new Service.ServiceConfiguration({
+let myService = microx({
   name: 'GW',
   port: 8081,
   host: '127.0.0.1'
-}))
+})
 
 // Define the GW server
 // The endpoint will call the math service to get answers
@@ -36,7 +37,7 @@ app.post('/multi', function(req, res) {
 })
 
 // Listen to start event, display a log and start the GW
-myService.on(Service.EVENTS.SERVICE_START, function () {
+myService.on(Events.SERVICE_START, function () {
   console.log('Service %s@%s started', this.meta.name, this.meta.version)
   app.listen(8080, function() {
     console.log('Gateway is up')
@@ -44,7 +45,7 @@ myService.on(Service.EVENTS.SERVICE_START, function () {
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+myService.on(Events.SERVICE_STOPPED, function () {
   console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
   process.exit()
 })

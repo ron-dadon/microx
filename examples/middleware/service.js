@@ -2,14 +2,15 @@
  * Created by Ron on 23/08/2017.
  */
 
-const Service = require('../../')
+const microx = require('../../')
+const Events = require('../../').Service.EVENTS
 
 // Define the service instance
-let myService = new Service(new Service.ServiceConfiguration({
+let myService = microx({
   name: 'simple-service',
   port: 8080,
   host: '127.0.0.1'
-}))
+})
 
 // Global middleware that will execute on all methods
 myService.use(function(msg, next) {
@@ -41,12 +42,12 @@ myService.provide('deduct', function(msg, next) {
 })
 
 // Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function () {
+myService.on(Events.SERVICE_START, function () {
   console.log('Service %s started @%s', this.meta.name, this.meta.port)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+myService.on(Events.SERVICE_STOPPED, function () {
   console.log('Service %s stopped', this.meta.name)
   process.exit()
 })

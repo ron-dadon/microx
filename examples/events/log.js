@@ -1,17 +1,18 @@
 /**
  * Created by Ron on 13/07/2017.
  */
-const Service = require('../../')
+const microx = require('../../')
+const Events = require('../../').Service.EVENTS
 
 // Array of last events from the service
 let lastEvents = []
 
 // Define the service instance
-let myService = new Service(new Service.ServiceConfiguration({
+let myService = microx({
   name: 'log',
   port: 8083,
   host: '127.0.0.1'
-}))
+})
 
 // Provide a get method in the service
 // The method will return the last 5 events logged in the system
@@ -28,12 +29,12 @@ myService.onEvent('math.*', function(event) {
 })
 
 // Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function() {
+myService.on(Events.SERVICE_START, function() {
   console.log('Service %s@%s started', this.meta.name, this.meta.version)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+myService.on(Events.SERVICE_STOPPED, function () {
   console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
   process.exit()
 })

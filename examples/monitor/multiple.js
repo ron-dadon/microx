@@ -2,14 +2,15 @@
  * Created by Ron on 13/07/2017.
  */
 
-const Service = require('../../')
+const microx = require('../../')
+const Events = require('../../').Service.EVENTS
 
 // Define the service instance
-let myService = new Service(new Service.ServiceConfiguration({
+let myService = microx({
   name: 'Multiple',
   port: 8082,
   host: '127.0.0.1'
-}))
+})
 
 // Provide a method in the service
 // The method will get 2 parameters, x and y and will return the multiple of them
@@ -20,12 +21,12 @@ myService.provide('multiple', function multiple(msg, reply) {
 })
 
 // Listen to start event and display a log
-myService.on(Service.EVENTS.SERVICE_START, function() {
+myService.on(Events.SERVICE_START, function() {
   console.log('Service %s@%s started', this.meta.name, this.meta.version)
 })
 
 // Listen to stop event and exit the process
-myService.on(Service.EVENTS.SERVICE_STOPPED, function () {
+myService.on(Events.SERVICE_STOPPED, function () {
   console.log('Service %s@%s stopped', this.meta.name, this.meta.version)
   process.exit()
 })
