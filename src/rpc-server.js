@@ -72,7 +72,7 @@ class RpcServer {
    * The reply function signature is a standard callback signature (Error, data)
    *
    * @param {String} method Name of the method
-   * @param {Function} handler Handler function
+   * @param {...Function} handler Handler function or list of middlewares followed by handler function
    * @returns {RpcServer} Returns the instance of the server to provide method chaining
    */
   provide(method, handler) {
@@ -81,7 +81,7 @@ class RpcServer {
     if (args.length < 2) throw new Error('Invalid arguments provided')
     if (args.length > 2) {
       handler = args[args.length - 1]
-      mw = args.slice(1, args.length - 1)
+      mw = args.slice(1, args.length - 1).filter((f) => { return typeof f === 'function' })
     }
     // Set method handler
     this.methodHandlers[method] = handler
@@ -201,6 +201,11 @@ class RpcServer {
     // Execute middlewares
     if (this.middleware.length) {
       callMiddleware(this.middleware, 0, sourceMsg, next, this)
+      if (mwError) return
+    }
+
+    if (this.methodMiddleware[req.params.method].length) {
+      callMiddleware(this.methodMiddleware[req.params.method], 0, sourceMsg, next, this)
       if (mwError) return
     }
 

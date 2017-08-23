@@ -280,7 +280,7 @@ class Service extends EventEmitter {
    * Provide a method via the service
    *
    * @param {String|Object} method The method name or an object that provide a mapping from method names to handler functions
-   * @param {Function} [handler] The method handler
+   * @param {...Function} [handler] The method handler or list of middleware followed by handler
    * @returns {Service}
    */
   provide(method, handler) {
@@ -291,7 +291,7 @@ class Service extends EventEmitter {
         }
       }
     } else {
-      this.server.provide(method, handler)
+      this.server.provide.apply(this.server, Array.from(arguments))
     }
     return this
   }

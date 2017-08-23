@@ -6,6 +6,7 @@
 2. [Installation](#installation)
 3. [Architecture](architecture.md)
 4. [Getting Started](getting-started.md)
+5. [Middleware](middleware.md)
 5. [API](api.md)
 6. [Examples](#examples)
 6. [License](#license)
@@ -56,6 +57,8 @@ See the following examples for better understanding of how to use microX.
 2. [Multiple services](https://github.com/ron-dadon/microx/tree/master/examples/multiple%20services)
 3. [Events](https://github.com/ron-dadon/microx/tree/master/examples/events)
 4. [Monitoring](https://github.com/ron-dadon/microx/tree/master/examples/monitor)
+5. [Mockup](https://github.com/ron-dadon/microx/tree/master/examples/mockup)
+6. [Middleware](https://github.com/ron-dadon/microx/tree/master/examples/middleware)
 
 ## License
 
