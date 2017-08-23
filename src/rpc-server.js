@@ -21,6 +21,8 @@ class RpcServer {
     this.server = null
     this.methodHandlers = {}
     this.eventHandlers = {}
+    this.middleware = []
+    this.methodMiddleware = {}
     this.running = false
     this._init()
   }
@@ -58,6 +60,12 @@ class RpcServer {
     }
   }
 
+  use(mw) {
+    if (typeof mw !== 'function') throw new Error('Middlware must be a function')
+    this.middleware.push(mw)
+    return this
+  }
+
   /**
    * Setup a method handler
    * The handler function signature is (Message, Reply function)
@@ -68,8 +76,16 @@ class RpcServer {
    * @returns {RpcServer} Returns the instance of the server to provide method chaining
    */
   provide(method, handler) {
+    let args = Array.from(arguments)
+    let mw = []
+    if (args.length < 2) throw new Error('Invalid arguments provided')
+    if (args.length > 2) {
+      handler = args[args.length - 1]
+      mw = args.slice(1, args.length - 1)
+    }
     // Set method handler
     this.methodHandlers[method] = handler
+    this.methodMiddleware[method] = mw
     return this
   }
 
@@ -180,6 +196,14 @@ class RpcServer {
     // Construct the message from the HTTP IncomingMessage
     let sourceMsg = new Message(req.body, req.headers)
 
+    let mwError = false
+
+    // Execute middlewares
+    if (this.middleware.length) {
+      callMiddleware(this.middleware, 0, sourceMsg, next, this)
+      if (mwError) return
+    }
+
     // Call the method handler, and wait for the reply function to be called
     // reply function can be called only once, the following times will be ignored
     this.methodHandlers[req.params.method](sourceMsg, replyGenerator(sourceMsg, this), this.service)
@@ -196,6 +220,19 @@ class RpcServer {
         executed = true
       }
     }
+
+    function callMiddleware(middlewares, index, msg, next, service) {
+      middlewares[index](msg, function(err) {
+        if (err) {
+          mwError = true
+          return next(err)
+        }
+        if (++index < middlewares.length) {
+          callMiddleware(middlewares, index, msg, next, service)
+        }
+      }, service)
+    }
+
   }
 
   /**

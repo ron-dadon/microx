@@ -297,6 +297,18 @@ class Service extends EventEmitter {
   }
 
   /**
+   * Provide a middleware to run before a method is executed
+   *
+   * @param {Function} mw the middleware function in the format of (msg, next)
+   *
+   * @returns {Service}
+   */
+  use(mw) {
+    this.server.use(mw)
+    return this
+  }
+
+  /**
    * Mockup another service method for development and debugging
    *
    * @param {String} service the name of the service
