@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="microX.docs">
+<head>
+  <meta charset="UTF-8">
+  <title>microX | Microservices framework for node.js</title>
+</head>
+<body>
+<div ng-controller="testCtrl as $ctrl">
+  <h1>{{$ctrl.title}}</h1>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.5/angular.min.js"></script>
+<script>
+  (function() {
+    angular.module('microX.docs', [])
+
+    angular.module('microX.docs').controller('testCtrl', function() {
+      this.title = 'Testing'
+    })
+  })()
+</script>
+</body>
+</html>
