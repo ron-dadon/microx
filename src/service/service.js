@@ -347,7 +347,7 @@ class Service extends EventEmitter {
 
     // Check if mockup method is defined
     if (this._mockupMethods[service + '#' + method]) {
-      let msg = new Message(data, parentMessage.headers || {}, this.meta.versionName)
+      let msg = new Message(data, parentMessage ? parentMessage.headers || {} : {}, this.meta.versionName)
       let mockup = this._mockupMethods[service + '#' + method]
       let $this = this
       return new Promise((res, rej) => {
@@ -355,7 +355,7 @@ class Service extends EventEmitter {
           if (err) {
             return rej(err)
           }
-          let replyMsg = new Message(data, parentMessage.headers || {}, service)
+          let replyMsg = new Message(data, parentMessage ? parentMessage.headers || {} : {}, service)
           res(replyMsg)
         }, $this)
       })
