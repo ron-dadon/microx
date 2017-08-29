@@ -3,11 +3,12 @@
  */
 
 const uuid = require('../uuid')
+const sha256 = require('../sha256')
 
 class ServiceMeta {
 
   constructor(name, version, port, host, secure, id, ttl) {
-    this.id = id || uuid()
+
     this.versionName = name + '@' + version
     this.name = name
     this.version = version
@@ -16,10 +17,7 @@ class ServiceMeta {
     this.url = 'http' + (secure ? 's' : '') + '://' + this.host + ':' + (this.port || (secure ? 443 : 80))
     this.secure = secure
     this.ttl = ttl || 10
-  }
-
-  getUrl() {
-    return 'http' + (this.secure ? 's' : '') + '://' + this.host + ':' + (this.port || (this.secure ? 443 : 80))
+    this.id = id || sha256(this.versionName + this.url + this.ttl)
   }
 
 }

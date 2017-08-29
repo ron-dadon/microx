@@ -13,23 +13,24 @@ class Queue {
 
   push(item) {
     this.items.unshift(item)
+    return Promise.resolve(this.items.length)
   }
 
   peek() {
-    if (!this.items.length) return null
-    return this.items[0]
+    if (!this.items.length) return Promise.resolve(null)
+    return Promise.resolve(this.items[0])
   }
 
   pop() {
-    return this.items.pop()
+    return Promise.resolve(this.items.pop())
   }
 
   length() {
-    return this.items.length
+    return Promise.resolve(this.items.length)
   }
 
   toArray() {
-    return this.items;
+    return Promise.resolve(this.items);
   }
 
 }

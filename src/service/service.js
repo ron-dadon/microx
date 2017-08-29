@@ -16,7 +16,7 @@ const Event = require('./../event').Event
 const EventMeta = require('./../event').EventMeta
 const MulticastEvent = require('./../event').MulticastEvent
 const RoundRobinMap = require('./../round-robin-map')
-const Queue = require('./../queue')
+const Queue = require('./../redis-queue')
 const Message = require('../message')
 
 const FrameworkEvents = {
@@ -45,22 +45,28 @@ const EVENTS = {
   SERVICE_PING_INTERVAL_STARTED: 'service ping interval started',
   SERVICE_PING_INTERVAL_STOPPED: 'service ping interval stopped',
   SERVICE_PING_SENT: 'service ping sent',
-  SERVICE_PING_ERROR: 'service ping error',
+  SERVICE_PING_ERROR: 'service ping error'
 }
 
 class ServiceConfiguration {
 
   constructor(opt) {
+
+    if (!opt.name) {
+      throw new Error('Service name is required')
+    }
+
     this.name = opt.name || ''
     this.version = opt.version || '1.0.0'
-    this.port = opt.port || 8080
+    this.port = parseInt(opt.port || 8080)
     this.host = opt.host || 'localhost'
-    this.secure = opt.secure || false
+    this.secure = !!(opt.secure || false)
     this.redisConfig = opt.redisConfig || {}
 
     if (!semver.valid(this.version)) {
       throw new Error('Invalid version. Version must follow semantic version specifications')
     }
+
   }
 
 }
@@ -115,7 +121,7 @@ class Service extends EventEmitter {
       }
       this.services[meta.versionName].push(meta.id, meta)
       if (!this.servicesEvents[meta.versionName]) {
-        this.servicesEvents[meta.versionName] = new Queue()
+        this.servicesEvents[meta.versionName] = new Queue(this)
       }
       this.emit(EVENTS.SERVICE_PING, meta)
     }
@@ -462,6 +468,16 @@ class Service extends EventEmitter {
   }
 
   /**
+   * Get updated metrics data
+   *
+   * @returns {ServiceMetrics}
+   */
+  getMetrics() {
+    this.metrics.upTime = Date.now() - this.metrics.startedAt
+    return this.metrics
+  }
+
+  /**
    * Broadcast a multicast event via redis publish client
    *
    * @param {String} event Event name
@@ -473,13 +489,14 @@ class Service extends EventEmitter {
 
     // Construct multicast event object
     let e = new MulticastEvent(event, data, this.meta.id)
-
+    let metrics = this.metrics
     // Publish the event to the event channel and return a promise with the number of subscribers that got the message
     return new Promise((res, rej) => {
       this.pubClient.publish(event, JSON.stringify(e), (err, result) => {
         if (err) {
           return rej(err)
         }
+        metrics.lastMulticast = Date.now()
         res(result)
       })
     })
@@ -508,26 +525,27 @@ class Service extends EventEmitter {
     this.subClient.psubscribe('*')
   }
 
+  /**
+   * Process an event and broadcast it to all the services
+   *
+   * @private
+   */
   _processEvent() {
 
-    let moreEvents = false
+    // let moreEvents = false
+    let $this = this
 
     // Go over all the services and broadcast to all of them
     for (let serviceCollection in this.servicesEvents) {
       if (!this.servicesEvents.hasOwnProperty(serviceCollection)) continue
-      let event = this.servicesEvents[serviceCollection].peek()
-      this.call(serviceCollection, FrameworkCalls.EVENT, event).then(clearEvent(serviceCollection).bind(this)).catch(() => {})
-    }
-
-    if (moreEvents) {
-      process.nextTick(this._processEvent.bind(this))
-    }
-
-    function clearEvent(serviceCollection) {
-      return (function() {
-        this.servicesEvents[serviceCollection].pop()
-        moreEvents |= !!this.servicesEvents[serviceCollection].length()
-      }).bind(this)
+      this.servicesEvents[serviceCollection].peek().then((event) => {
+        if (!event) return null
+        return $this.call(serviceCollection, FrameworkCalls.EVENT, event).then(() => {
+          $this.servicesEvents[serviceCollection].pop().then(() => {
+            process.nextTick($this._processEvent.bind($this))
+          })
+        })
+      }).catch(() => {})
     }
 
   }
