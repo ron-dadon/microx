@@ -1,4 +1,4 @@
-# microX
+# microX [![npm version](https://badge.fury.io/js/microx.svg)](https://badge.fury.io/js/microx)
 Microservices framework for Node.js
 
 ## UNDER DEVELOPMENT
