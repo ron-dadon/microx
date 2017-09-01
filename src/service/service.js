@@ -191,10 +191,11 @@ class Service extends EventEmitter {
             delete this.services[serviceCollection].items[serviceId]
           }
         }
-        if (this.services[serviceCollection].count() === 0) {
-          delete this.services[serviceCollection]
-          delete this.servicesEvents[serviceCollection]
-        }
+        // Disable removal of service from the list, to preserve events
+        // if (this.services[serviceCollection].count() === 0) {
+        //   delete this.services[serviceCollection]
+        //   delete this.servicesEvents[serviceCollection]
+        // }
       }
       _updateVersions.call(this)
       this.emit(EVENTS.SERVICE_CLEAN, this.services)
@@ -303,6 +304,17 @@ class Service extends EventEmitter {
   }
 
   /**
+   * An alias for provide
+   *
+   * @param {String|Object} method The method name or an object that provide a mapping from method names to handler functions
+   * @param {...Function} [handler] The method handler or list of middleware followed by handler
+   * @returns {Service}
+   */
+  method(method, handler) {
+    return this.provide.apply(this, Array.from(arguments))
+  }
+
+  /**
    * Provide a middleware to run before a method is executed
    *
    * @param {Function} mw the middleware function in the format of (msg, next)
@@ -330,6 +342,17 @@ class Service extends EventEmitter {
     }
 
     this._mockupMethods[service + '#' + method] = handler
+  }
+
+  /**
+   * Alias for mockup method
+   *
+   * @param {String} service the name of the service
+   * @param {String} method the name of the method
+   * @param {Function} handler the handler function
+   */
+  mock(service, method, handler) {
+    return this.mockup(service, method, handler)
   }
 
   /**
@@ -427,13 +450,13 @@ class Service extends EventEmitter {
   }
 
   /**
-   * Register a service event listener
+   * Subscribe to an event
    *
    * @param {String} event Event name
    * @param {Function} handler Event handler function, signature (Event)
    * @returns {Service} Returns the service instance for method chaining
    */
-  onEvent(event, handler) {
+  subscribe(event, handler) {
     // Assign server event handler
     this.server.onEvent(event, handler)
     return this

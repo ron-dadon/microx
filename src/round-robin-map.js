@@ -28,6 +28,7 @@ class RoundRobinMap {
 
   getNext() {
     let values = Object.values(this.items)
+    if (!values.length) return null;
     if (this.lastIndex >= values.length) {
       this.lastIndex = 0
     }
