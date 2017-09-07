@@ -30,6 +30,11 @@ myService.on(Events.SERVICE_STOPPED, function () {
   process.exit()
 })
 
+// Listen to stop event and exit the process
+myService.on(Events.SERVICE_PING, function (meta) {
+  console.log('Service %s@%s pinged: %j', meta.name, meta.version, meta)
+})
+
 // Start the service
 myService.start()
 

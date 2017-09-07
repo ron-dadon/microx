@@ -62,6 +62,8 @@ class ServiceConfiguration {
     this.host = opt.host || 'localhost'
     this.secure = !!(opt.secure || false)
     this.redisConfig = opt.redisConfig || {}
+    this.bodyParserConfig = opt.bodyParserConfig || {limit: '50mb'}
+    this.requestDefaultOptions = opt.requestDefaultOptions || {timeout: 10000}
 
     if (!semver.valid(this.version)) {
       throw new Error('Invalid version. Version must follow semantic version specifications')
@@ -82,10 +84,6 @@ class Service extends EventEmitter {
     this.meta = new ServiceMeta(opt.name, opt.version, opt.port, opt.host, opt.secure)
     this.metrics = new ServiceMetrics()
     this.redisConfig = opt.redisConfig
-    this.pubClient = new Redis(this.redisConfig)
-    this.subClient = new Redis(this.redisConfig)
-    this.server = new Server(this)
-    this.client = new Client(this)
     this._multicastHandlers = {}
     this._generalMulticastHandler = null
     this.services = {}
@@ -93,6 +91,11 @@ class Service extends EventEmitter {
     this.servicesEvents = {}
     this._multicastRepeater = null
     this._mockupMethods = {}
+    this._options = opt
+    this.pubClient = new Redis(this.redisConfig)
+    this.subClient = new Redis(this.redisConfig)
+    this.server = new Server(this)
+    this.client = new Client(this)
 
     this.subClient.on('message', _messageHandler.bind(this))
 
@@ -230,8 +233,10 @@ class Service extends EventEmitter {
         this.emit(EVENTS.RPC_SERVER_ERROR, err)
       }).bind(this))
 
+    this.metrics.startedAt = Date.now()
+
     // Send service ping and initialize pinging interval
-    this._multicast(FrameworkEvents.BROADCAST, this.meta)
+    this._multicast(FrameworkEvents.BROADCAST, Object.assign({}, this.meta, {metrics: this.metrics}))
       .then(emitSent.bind(this))
       .catch(emitError.bind(this))
 
@@ -240,7 +245,8 @@ class Service extends EventEmitter {
     this.emit(EVENTS.SERVICE_PING_INTERVAL_STARTED, interval)
 
     this._multicastRepeater = setInterval((function() {
-      this._multicast(FrameworkEvents.BROADCAST, this.meta)
+      this.metrics.upTime = Date.now() - this.metrics.startedAt
+      this._multicast(FrameworkEvents.BROADCAST, Object.assign({}, this.meta, {metrics: this.metrics}))
         .then(emitSent.bind(this))
         .catch(emitError.bind(this))
     }).bind(this), interval)
@@ -363,10 +369,11 @@ class Service extends EventEmitter {
    * @param {String} method Method name
    * @param {Object} [data] Data to send
    * @param {Message} [parentMessage] Parent message in case of cascaded calls for request tracking
+   * @param {Object} [opt] Options to pass to the request module
    *
    * @returns {Promise}
    */
-  call(service, method, data, parentMessage) {
+  call(service, method, data, parentMessage, opt) {
 
     // Use default version if no version is set
     // The default version will be the latest version or fallback to 1.0.0
@@ -406,7 +413,7 @@ class Service extends EventEmitter {
     }
 
     // Perform the call
-    return this.client.call(instance.url, method, data, parentMessage)
+    return this.client.call(instance.url, method, data, parentMessage, opt)
   }
 
   /**

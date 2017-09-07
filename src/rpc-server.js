@@ -10,6 +10,7 @@ const Message = require('./message')
 class RpcServer {
 
   /**
+   * Construct a new RpcServer instance
    *
    * @param {Service} service
    */
@@ -17,7 +18,7 @@ class RpcServer {
     this.service = service
     this.app = express()
     this.app.use(cors())
-    this.app.use(jsonBodyParser())
+    this.app.use(jsonBodyParser(service._options.bodyParserConfig))
     this.server = null
     this.methodHandlers = {}
     this.eventHandlers = {}

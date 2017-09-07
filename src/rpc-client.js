@@ -6,14 +6,21 @@ const request = require('request')
 
 class RpcClient {
 
-  call(url, method, data) {
+  constructor(service) {
+    this._service = service
+  }
+
+  call(url, method, data, parent, opt) {
     return new Promise((res, rej) => {
-      request({
+
+      opt = Object.assign({}, this._service._options.requestDefaultOptions, opt, {
         url: [url, method].join('/'),
+        headers: parent ? parent.headers : {},
         method: 'POST',
         body: data,
         json: true
-      }, (err, response) => {
+      })
+      request(opt, (err, response) => {
         if (err) {
           rej(err)
         } else {
